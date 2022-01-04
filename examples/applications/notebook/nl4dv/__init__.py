@@ -146,31 +146,43 @@ class NL4DV:
         # DETECT EXPLICIT AND IMPLICIT ATTRIBUTES
         st = time.time()
         self.extracted_attributes = self.attribute_genie_instance.extract_attributes(self.query_ngrams)
+        # print(self.extracted_attributes)
         helpers.cond_print("Final Extracted Attributes: " + str(list(self.extracted_attributes.keys())), self.verbose)
         self.execution_durations['extract_attributes'] = time.time() - st
 
         # DETECT EXPLICIT VISUALIZATION UTTERANCES
         st = time.time()
         self.extracted_vis_type, self.extracted_vis_token = self.vis_genie_instance.extract_vis_type(self.query_ngrams)
+        # print(self.extracted_vis_type)
+        # print("$$\n")
+        # print(self.extracted_vis_token)
         self.execution_durations['extract_vis_type'] = time.time() - st
 
         # DETECT IMPLICIT AND EXPLICIT TASKS
         st = time.time()
         self.query_for_task_inference = self.task_genie_instance.prepare_query_for_task_inference(self.query_processed)
+        # print(self.query_for_task_inference)
         self.dependencies = self.task_genie_instance.create_dependency_tree(self.query_for_task_inference)
+        # print(self.dependencies)
         task_map = self.task_genie_instance.extract_explicit_tasks_from_dependencies(self.dependencies)
+        # print(task_map)
 
         # Filters from Domain Values
         task_map = self.task_genie_instance.extract_explicit_tasks_from_domain_value(task_map)
+        # print(task_map)
+
 
         # At this stage, which attributes are encodeable?
         encodeable_attributes = self.attribute_genie_instance.get_encodeable_attributes()
+        # print(encodeable_attributes)
 
         # INFER tasks based on (encodeable) attribute Datatypes
         task_map = self.task_genie_instance.extract_implicit_tasks_from_attributes(task_map, encodeable_attributes)
+        # print(task_map)
 
         # From the generated TaskMap, ensure that the task "keys" are NOT EMPTY LISTS
         self.extracted_tasks = self.task_genie_instance.filter_empty_tasks(task_map)
+        # print(self.extracted_tasks)
         self.execution_durations['extract_tasks'] = time.time() - st
 
         # RECOMMEND VISUALIZATIONS FROM ATTRIBUTES, TASKS, and VISUALIZATIONS
@@ -178,6 +190,7 @@ class NL4DV:
 
         # Final list of encodeable attributes in the VIS
         final_encodeable_attributes = self.attribute_genie_instance.update_encodeable_attributes_based_on_tasks()
+        # print(final_encodeable_attributes)
 
         self.vis_list = self.vis_genie_instance.get_vis_list(attribute_list=final_encodeable_attributes)
         self.execution_durations['get_vis_list'] = time.time() - st

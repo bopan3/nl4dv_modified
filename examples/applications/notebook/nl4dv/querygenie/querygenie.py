@@ -53,7 +53,7 @@ class QueryGenie:
                 ngrams[ngram_str]['raw'] = ngram
                 ngrams[ngram_str]['lower'] = ngram_str
                 ngrams[ngram_str]['stemmed_lower'] = ' '.join(self.nl4dv_instance.porter_stemmer_instance.stem(t) for t in nltk.word_tokenize(ngram_str))
-
+        # print(ngrams) ####
         return ngrams
 
     # Create a parts of speech map from the Query Tokens
