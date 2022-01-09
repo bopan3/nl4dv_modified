@@ -1,4 +1,5 @@
 # In-built Libraries
+import pprint
 import os
 import time
 from collections import OrderedDict
@@ -78,6 +79,7 @@ class NL4DV:
 
         # Others
         self.dialog = False
+        # self.dialog = True
 
         # initialize porter stemmer instance
         self.porter_stemmer_instance = PorterStemmer()
@@ -140,15 +142,19 @@ class NL4DV:
         self.query_processed = self.query_genie_instance.process_query(self.query_raw)
         self.query_tokens = self.query_genie_instance.clean_query_and_get_query_tokens(self.query_processed, self.reserve_words, self.ignore_words)
         self.query_ngrams = self.query_genie_instance.get_query_ngrams(' '.join(self.query_tokens))
+        # pprint.pprint(self.query_ngrams) #% FOR CODE UNDERSTAND %
         helpers.cond_print("Processed Query: " + self.query_processed, self.verbose)
         self.execution_durations['clean_query'] = time.time() - st
 
         # DETECT EXPLICIT AND IMPLICIT ATTRIBUTES
         st = time.time()
         self.extracted_attributes = self.attribute_genie_instance.extract_attributes(self.query_ngrams)
-        # print(self.extracted_attributes)
+        # self.extracted_attributes.update(self.attribute_genie_instance.extract_attributes(self.query_ngrams))
+        # print(self.extracted_attributes)  #% FOR CODE UNDERSTAND %
+        # print(self.keyword_attribute_mapping)  #% FOR CODE UNDERSTAND %
         helpers.cond_print("Final Extracted Attributes: " + str(list(self.extracted_attributes.keys())), self.verbose)
         self.execution_durations['extract_attributes'] = time.time() - st
+        # pprint.pprint(self.keyword_attribute_mapping) #% FOR CODE UNDERSTAND %
 
         # DETECT EXPLICIT VISUALIZATION UTTERANCES
         st = time.time()
@@ -163,7 +169,7 @@ class NL4DV:
         self.query_for_task_inference = self.task_genie_instance.prepare_query_for_task_inference(self.query_processed)
         # print(self.query_for_task_inference)
         self.dependencies = self.task_genie_instance.create_dependency_tree(self.query_for_task_inference)
-        # print(self.dependencies)
+        # pprint.pprint(self.dependencies) #% FOR CODE UNDERSTAND %
         task_map = self.task_genie_instance.extract_explicit_tasks_from_dependencies(self.dependencies)
         # print(task_map)
 
@@ -182,6 +188,7 @@ class NL4DV:
 
         # From the generated TaskMap, ensure that the task "keys" are NOT EMPTY LISTS
         self.extracted_tasks = self.task_genie_instance.filter_empty_tasks(task_map)
+        # self.extracted_tasks.update(self.task_genie_instance.filter_empty_tasks(task_map))
         # print(self.extracted_tasks)
         self.execution_durations['extract_tasks'] = time.time() - st
 

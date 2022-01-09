@@ -1,3 +1,4 @@
+import pprint
 from nl4dv.utils import constants, helpers
 import copy
 import nltk
@@ -412,24 +413,40 @@ class AttributeGenie:
 
         # map of attributes and their variants - stemmed, lowercase, ...
         attribute_aliases = self.get_attribute_aliases()
+        # pprint.pprint(data_attributes)  #% FOR CODE UNDERSTAND %
+        # pprint.pprint(attribute_aliases)  #% FOR CODE UNDERSTAND %
+        # print("\nbefore any query_attributes extraction\n") #% FOR CODE UNDERSTAND %
+        # print(query_attributes) #% FOR CODE UNDERSTAND %
 
         # Detect attributes by token exact match
         query_attributes = self.detect_attributes_by_exact_match(query_ngrams, data_attributes, query_attributes)
+        # print("\ndetect_attributes_by_exact_match:\n") #% FOR CODE UNDERSTAND %
+        # print(query_attributes) #% FOR CODE UNDERSTAND %
 
         # Detect attributes by token similarity
         query_attributes = self.detect_attributes_by_similarity(query_ngrams, data_attributes, query_attributes)
+        # print("\ndetect_attributes_by_similarity:\n") #% FOR CODE UNDERSTAND %
+        # print(query_attributes) #% FOR CODE UNDERSTAND %
 
         # Detect attributes by alias exact match
         query_attributes = self.detect_attributes_by_alias_exact_match(query_ngrams, data_attributes, query_attributes, attribute_aliases)
+        # print("\ndetect_attributes_by_alias_exact_match:\n") #% FOR CODE UNDERSTAND %
+        # print(query_attributes) #% FOR CODE UNDERSTAND %
 
         # Detect attributes by alias similarity
         query_attributes = self.detect_attributes_by_alias_similarity(query_ngrams, data_attributes, query_attributes, attribute_aliases)
+        # print("\ndetect_attributes_by_alias_similarity:\n") #% FOR CODE UNDERSTAND %
+        # print(query_attributes) #% FOR CODE UNDERSTAND %
 
         # Detect attributes by synonymity
         query_attributes = self.detect_attributes_by_synonymity(query_ngrams, data_attributes, query_attributes)
+        # print("\ndetect_attributes_by_synonymity:\n") #% FOR CODE UNDERSTAND %
+        # print(query_attributes) #% FOR CODE UNDERSTAND %
 
         # Detect attributes by domain value match
         query_attributes = self.detect_attributes_from_domain_value(query_ngrams, data_attributes, query_attributes)
+        # print("\ndetect_attributes_from_domain_value:\n") #% FOR CODE UNDERSTAND %
+        # pprint.pprint(query_attributes) #% FOR CODE UNDERSTAND 
 
         # ---------------------------------------------------------------------------------------------------
         # Rule Based Filter to ensure 1 keyword maps to the best attribute(s). THIS IS BY KEYWORD AND BY SCORE
@@ -444,18 +461,30 @@ class AttributeGenie:
         # ---------
         attributes_to_delete = set()
         used_keyword_attribute_mapping = dict()
+        # pprint.pprint(self.nl4dv_instance.keyword_attribute_mapping) #% FOR CODE UNDERSTAND %
+        # pprint.pprint(self.nl4dv_instance.attribute_keyword_mapping) #% FOR CODE UNDERSTAND %
+        # pprint.pprint(query_attributes) #% FOR CODE UNDERSTAND %
+
 
         for attr in query_attributes:
             keywords = query_attributes[attr]["queryPhrase"]
+            # print("attr:")
+            # print(attr)
+            # print("----")
             score = query_attributes[attr]['matchScore']
             for keyword in keywords:
                 if keyword in self.nl4dv_instance.keyword_attribute_mapping:
                     used_keyword_attribute_mapping[keyword] = self.nl4dv_instance.keyword_attribute_mapping[keyword]
                 for _attr in self.nl4dv_instance.keyword_attribute_mapping[keyword]:
+                    # print("@")
+                    # print(_attr)
+                    # print("#")
                     if score > self.nl4dv_instance.keyword_attribute_mapping[keyword][_attr]:
                         attributes_to_delete.add(_attr)
                     elif score < self.nl4dv_instance.keyword_attribute_mapping[keyword][_attr]:
                         attributes_to_delete.add(attr)
+                    # else:
+                        # print("equal!")
 
         # Delete unused keywords from the main self.nl4dv_instance.keyword_attribute_mapping dictionary
         copy_keyword_attribute_mapping = copy.deepcopy(self.nl4dv_instance.keyword_attribute_mapping)
@@ -468,6 +497,10 @@ class AttributeGenie:
         for _key in copy_keyword_attribute_mapping:
             for _attr in copy_keyword_attribute_mapping[_key]:
                 if _key not in query_attributes[_attr]["queryPhrase"]:
+                    # print("--S--")
+                    # print(_key)
+                    # print(_attr)
+                    # print("--E--")
                     del self.nl4dv_instance.keyword_attribute_mapping[_key][_attr]
         # ---------------------------------------------------------------------------------------------------
         # ---------------------------------------------------------------------------------------------------

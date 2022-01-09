@@ -41,12 +41,28 @@ def synonymity_score(word_x, word_y):
     Helper method to find similarity between two words
 
     """
+    # print("################################################")
+    # print("word_x:")
+    # print(word_x)
+    # print("word_y:")
+    # print(word_y)
     sem_1 = wn.synsets(word_x)
     sem_2 = wn.synsets(word_y)
+    # print(sem_1)
+    # print(sem_2)
     max_score = 0
     for i, j in list(product(*[sem_1, sem_2])):
+        # print("i:")
+        # print(i)
+        # print("j:")
+        # print(j)
         score = i.wup_similarity(j)
+        # print("score:")
+        # print(score)
         max_score = score if (score is not None and max_score < score) else max_score
+    # print("max_score:")
+    # print(max_score)
+    # print("################################################")
 
     return max_score * 100
 

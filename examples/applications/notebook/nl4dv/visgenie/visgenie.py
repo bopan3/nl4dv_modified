@@ -35,6 +35,8 @@ class VisGenie:
         for i in range(1, len(attribute_list) + 1):
             combinations = itertools.combinations(attribute_list, i)
             for combo in combinations:
+                # print("\n##")
+                # print(combo)
                 if self.nl4dv_instance.attribute_genie_instance.validate_attr_combo(attr_combo=combo, query_phrase=[], allow_subset=False):
                     continue
 

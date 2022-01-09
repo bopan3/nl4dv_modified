@@ -1,3 +1,4 @@
+import pprint
 from collections import Counter
 import json
 import sys
@@ -41,6 +42,8 @@ class DataGenie:
             self.set_alias_map(alias_url = self.nl4dv_instance.alias_url)
         elif self.nl4dv_instance.alias_value is not None:
             self.set_alias_map(alias_value = self.nl4dv_instance.alias_value)
+        # pprint.pprint(self.data_attribute_map['Running Time']) #% FOR CODE UNDERSTAND %
+        # pprint.pprint(self.data_attribute_map['Release Year']) #% FOR CODE UNDERSTAND %
 
     # Update the attribute datatypes that were not correctly detected by NL4DV
     def set_attribute_datatype(self, attr_type_obj):
@@ -71,7 +74,7 @@ class DataGenie:
 
     # Sets the Dataset
     def set_data(self, data_url=None, data_value=None):
-        # type: (str) -> None
+        ## type: (str) -> None
         """
         User can choose to manually initialize data
 
@@ -104,9 +107,13 @@ class DataGenie:
                 self.data = data_value
             elif isinstance(data_value, dict):
                 self.data = pd.DataFrame(data_value).to_dict('records')
-
+        # pprint.pprint(self.data)  #% FOR CODE UNDERSTAND %
         # Set number of rows in the dataset
         self.rows = len(self.data)
+        # print(pd.read_csv(self.nl4dv_instance.data_url, sep=',').to_dict('records')) #% FOR CODE UNDERSTAND %
+        # print(self.data) #% FOR CODE UNDERSTAND %
+        # print(self.data[0]) #% FOR CODE UNDERSTAND %
+
 
         # initialize properties in Attribute Map
         if len(self.data) > 0:
@@ -173,7 +180,7 @@ class DataGenie:
 
             # Update the dataset metadata for each attribute
             self.populate_dataset_meta_for_attr(attr, attr_datatype)
-
+        # print(self.data_attribute_map['Title']) #% FOR CODE UNDERSTAND %
     # Sets the Alias Map
     def set_alias_map(self, alias_value=None, alias_url=None):
         # type: (dict, str) -> None

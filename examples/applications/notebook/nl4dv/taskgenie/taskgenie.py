@@ -70,7 +70,7 @@ class TaskGenie:
                 dependency[1].encode('utf-8')
                 dependency[2][0].encode('utf-8')
                 dependency[2][1].encode('utf-8')
-
+            # print(dependencies) #% FOR CODE UNDERSTAND %
             return dependencies
 
         elif self.nl4dv_instance.dependency_parser == "corenlp-server":
