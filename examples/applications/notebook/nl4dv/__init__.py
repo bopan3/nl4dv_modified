@@ -9,7 +9,7 @@ import json
 import spacy
 from nltk.stem.porter import PorterStemmer
 from nltk.parse.stanford import StanfordDependencyParser
-from nltk.parse.corenlp import CoreNLPDependencyParser
+from nltk.parse.corenlp import CoreNLPDependencyParser, transform
 
 from vega import VegaLite
 
@@ -19,6 +19,7 @@ from nl4dv.querygenie import QueryGenie
 from nl4dv.attributegenie import AttributeGenie
 from nl4dv.taskgenie import TaskGenie
 from nl4dv.visgenie import VisGenie
+from nl4dv.dialoggenie import DialogGenie
 from nl4dv.utils import helpers, constants, error_codes
 
 
@@ -90,6 +91,7 @@ class NL4DV:
         self.attribute_genie_instance = AttributeGenie(self)   # initialize a AttributeGenie instance.
         self.task_genie_instance = TaskGenie(self)  # initialize a TaskGenie instance.
         self.vis_genie_instance = VisGenie(self)   # initialize a VisGenie instance.
+        self.dialog_genie_instance = DialogGenie(self)   # initialize a VisGenie instance.
 
         # Set the dependency parser if config is not None
         if self.dependency_parser_config is not None:
@@ -114,13 +116,25 @@ class NL4DV:
         if len(response['visList']) == 0:
             print("No best Viz; please try again.")
             return VegaLite({})
-        return VegaLite(response['visList'][0]['vlSpec'])
+        #M check if the current query only has fillter task. if yes, renew the fillter of the previous response
+        if not self.task_genie_instance.has_non_filter_explicit_task(response['taskMap']):
+            print("a follow up query!")
+            self.dialog_genie_instance.renew_fillter(response,mode='OR with fillter which has the same field')
+            # previous_transform = self.dialog_genie_instance.previous_response['visList'][0]['vlSpec']['transform']
+            # current_transform = response['visList'][0]['vlSpec']['transform']
+            # previous_transform.extend(current_transform)
+            # print(previous_transform)
+        else:
+            print("normal query")
+            self.dialog_genie_instance.previous_response = response # cache the previous response for dialog
+        print(self.dialog_genie_instance.previous_response['visList'][0]['vlSpec']['transform'])
+        return VegaLite(self.dialog_genie_instance.previous_response['visList'][0]['vlSpec'])    
 
     # ToDo:- Discuss support for non-ascii characters? Fallback from unicode to ascii good enough?
     # ToDo:- Discuss ERROR Handling
     # ToDo:- Utilities to perform unit conversion (eg. seconds > minutes). Problem: Tedious to infer base unit from data. - LATER
     def analyze_query(self, query=None, dialog=None, debug=None, verbose=None):
-        # type: (str) -> dict
+        ## type: (str) -> dict
 
         self.execution_durations = dict()
         self.dialog = dialog if dialog is not None else self.dialog
